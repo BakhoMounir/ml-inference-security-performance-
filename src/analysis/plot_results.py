@@ -42,5 +42,37 @@ plt.grid(True)
 plt.savefig(RESULTS / "p95_latency_fp32_vs_int8.png", dpi=300)
 plt.close()
 
+gpu = pd.read_csv(RESULTS / "benchmark_fp32.csv")
+
+plt.figure(figsize=(8,5))
+plt.plot(
+    gpu["batch_size"],
+    gpu["throughput_samples_per_sec"],
+    marker="o",
+    label="GPU FP32 (GTX 1650)"
+)
+plt.xlabel("Batch Size")
+plt.ylabel("Throughput (samples/sec)")
+plt.title("GPU FP32 Serving Frontier")
+plt.legend()
+plt.grid(True)
+plt.savefig(RESULTS / "gpu_fp32_throughput.png", dpi=300)
+plt.close()
+
+
+plt.figure(figsize=(8,5))
+plt.plot(
+    gpu["batch_size"],
+    gpu["median_latency_ms"],
+    marker="o",
+    label="GPU FP32 (GTX 1650)"
+)
+plt.xlabel("Batch Size")
+plt.ylabel("Median Latency (ms)")
+plt.title("GPU FP32 Latency Scaling")
+plt.legend()
+plt.grid(True)
+plt.savefig(RESULTS / "gpu_fp32_latency.png", dpi=300)
+plt.close()
 
 print("Plots generated successfully.")
