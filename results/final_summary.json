@@ -1,0 +1,27 @@
+{
+    "accuracy": {
+        "FP32_accuracy_percent": 87.02,
+        "INT8_accuracy_percent": 87.16000000000001,
+        "accuracy_difference_percent": 0.14000000000001478
+    },
+    "performance": {
+        "GPU_FP32": {
+            "best_batch_size": 4,
+            "peak_throughput_samples_per_sec": 151.2,
+            "latency_ms": 26.4553
+        },
+        "CPU_FP32": {
+            "best_batch_size": 64,
+            "peak_throughput_samples_per_sec": 63.32,
+            "latency_ms": 1010.797
+        },
+        "CPU_INT8": {
+            "best_batch_size": 16,
+            "peak_throughput_samples_per_sec": 100.58,
+            "latency_ms": 159.081
+        }
+    },
+    "quantization": {
+        "cpu_throughput_speedup_factor": 1.588
+    }
+}
