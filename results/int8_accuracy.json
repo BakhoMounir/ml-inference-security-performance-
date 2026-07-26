@@ -1,0 +1,11 @@
+{
+  "model": "distilbert-base-uncased",
+  "variant": "int8_dynamic_quantization",
+  "checkpoint": "models/distilbert_imdb_baseline.pt",
+  "dataset": "stanfordnlp/imdb",
+  "split": "test",
+  "device": "cpu",
+  "test_loss": 0.29925217854917047,
+  "test_accuracy": 0.8716,
+  "test_accuracy_percent": 87.16000000000001
+}
