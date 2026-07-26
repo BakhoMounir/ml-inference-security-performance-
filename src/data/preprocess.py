@@ -1,4 +1,4 @@
-from datasets import load_dataset
+from datasets import load_from_disk
 from transformers import AutoTokenizer
 
 
@@ -7,7 +7,7 @@ MAX_LENGTH = 128
 
 
 def load_imdb_dataset():
-    dataset = load_dataset("stanfordnlp/imdb")
+    dataset = load_from_disk("imdb_dataset")
 
     return {
         "train": dataset["train"],

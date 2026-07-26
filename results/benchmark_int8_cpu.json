@@ -1,0 +1,72 @@
+[
+  {
+    "batch_size": 1,
+    "median_latency_ms": 47.8999,
+    "p95_latency_ms": 121.2559,
+    "throughput_samples_per_sec": 20.88,
+    "peak_memory_mb": null,
+    "num_warmup": 10,
+    "num_iters": 50,
+    "tag": "int8_cpu"
+  },
+  {
+    "batch_size": 2,
+    "median_latency_ms": 61.1958,
+    "p95_latency_ms": 101.6645,
+    "throughput_samples_per_sec": 32.68,
+    "peak_memory_mb": null,
+    "num_warmup": 10,
+    "num_iters": 50,
+    "tag": "int8_cpu"
+  },
+  {
+    "batch_size": 4,
+    "median_latency_ms": 71.4265,
+    "p95_latency_ms": 144.0455,
+    "throughput_samples_per_sec": 56.0,
+    "peak_memory_mb": null,
+    "num_warmup": 10,
+    "num_iters": 50,
+    "tag": "int8_cpu"
+  },
+  {
+    "batch_size": 8,
+    "median_latency_ms": 148.3611,
+    "p95_latency_ms": 284.3757,
+    "throughput_samples_per_sec": 53.92,
+    "peak_memory_mb": null,
+    "num_warmup": 10,
+    "num_iters": 50,
+    "tag": "int8_cpu"
+  },
+  {
+    "batch_size": 16,
+    "median_latency_ms": 193.5119,
+    "p95_latency_ms": 457.0004,
+    "throughput_samples_per_sec": 82.68,
+    "peak_memory_mb": null,
+    "num_warmup": 10,
+    "num_iters": 50,
+    "tag": "int8_cpu"
+  },
+  {
+    "batch_size": 32,
+    "median_latency_ms": 505.056,
+    "p95_latency_ms": 763.6298,
+    "throughput_samples_per_sec": 63.36,
+    "peak_memory_mb": null,
+    "num_warmup": 10,
+    "num_iters": 50,
+    "tag": "int8_cpu"
+  },
+  {
+    "batch_size": 64,
+    "median_latency_ms": 1113.4057,
+    "p95_latency_ms": 1409.1283,
+    "throughput_samples_per_sec": 57.48,
+    "peak_memory_mb": null,
+    "num_warmup": 10,
+    "num_iters": 50,
+    "tag": "int8_cpu"
+  }
+]

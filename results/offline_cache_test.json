@@ -1,0 +1,22 @@
+[
+  {
+    "batch_size": 1,
+    "median_latency_ms": 868.9751,
+    "p95_latency_ms": 872.7764,
+    "throughput_samples_per_sec": 1.15,
+    "peak_memory_mb": null,
+    "num_warmup": 2,
+    "num_iters": 5,
+    "tag": "offline_cache_test"
+  },
+  {
+    "batch_size": 2,
+    "median_latency_ms": 157.5891,
+    "p95_latency_ms": 177.1322,
+    "throughput_samples_per_sec": 12.69,
+    "peak_memory_mb": null,
+    "num_warmup": 2,
+    "num_iters": 5,
+    "tag": "offline_cache_test"
+  }
+]

@@ -15,3 +15,22 @@ logs/
 *.pth
 *.bin
 *.safetensors
+# Dataset
+imdb_dataset/
+*.tar.gz
+
+# Model checkpoints
+models/
+*.pt
+*.pth
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environments
+.venv/
+# HPC logs
+*.out
+*.err
+*.backup

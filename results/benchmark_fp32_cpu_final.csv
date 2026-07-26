@@ -1,0 +1,8 @@
+tag,batch_size,median_latency_ms,p95_latency_ms,throughput_samples_per_sec,peak_memory_mb,num_warmup,num_iters
+fp32_cpu_final,1,291.5736,765.4584,3.43,,20,100
+fp32_cpu_final,2,127.4018,312.6445,15.7,,20,100
+fp32_cpu_final,4,98.7885,203.5503,40.49,,20,100
+fp32_cpu_final,8,130.1948,232.1325,61.45,,20,100
+fp32_cpu_final,16,266.1827,403.6679,60.11,,20,100
+fp32_cpu_final,32,544.2553,688.5168,58.8,,20,100
+fp32_cpu_final,64,1010.797,1279.2822,63.32,,20,100

@@ -1,0 +1,8 @@
+tag,batch_size,median_latency_ms,p95_latency_ms,throughput_samples_per_sec,peak_memory_mb,num_warmup,num_iters
+int8_cpu_final,1,57.8248,139.0127,17.29,,20,100
+int8_cpu_final,2,79.4267,188.6403,25.18,,20,100
+int8_cpu_final,4,77.2793,148.0981,51.76,,20,100
+int8_cpu_final,8,107.6364,179.4975,74.32,,20,100
+int8_cpu_final,16,159.081,242.1778,100.58,,20,100
+int8_cpu_final,32,383.0927,533.9874,83.53,,20,100
+int8_cpu_final,64,1178.4127,1460.7468,54.31,,20,100

@@ -1,0 +1,72 @@
+[
+  {
+    "batch_size": 1,
+    "median_latency_ms": 291.5736,
+    "p95_latency_ms": 765.4584,
+    "throughput_samples_per_sec": 3.43,
+    "peak_memory_mb": null,
+    "num_warmup": 20,
+    "num_iters": 100,
+    "tag": "fp32_cpu_final"
+  },
+  {
+    "batch_size": 2,
+    "median_latency_ms": 127.4018,
+    "p95_latency_ms": 312.6445,
+    "throughput_samples_per_sec": 15.7,
+    "peak_memory_mb": null,
+    "num_warmup": 20,
+    "num_iters": 100,
+    "tag": "fp32_cpu_final"
+  },
+  {
+    "batch_size": 4,
+    "median_latency_ms": 98.7885,
+    "p95_latency_ms": 203.5503,
+    "throughput_samples_per_sec": 40.49,
+    "peak_memory_mb": null,
+    "num_warmup": 20,
+    "num_iters": 100,
+    "tag": "fp32_cpu_final"
+  },
+  {
+    "batch_size": 8,
+    "median_latency_ms": 130.1948,
+    "p95_latency_ms": 232.1325,
+    "throughput_samples_per_sec": 61.45,
+    "peak_memory_mb": null,
+    "num_warmup": 20,
+    "num_iters": 100,
+    "tag": "fp32_cpu_final"
+  },
+  {
+    "batch_size": 16,
+    "median_latency_ms": 266.1827,
+    "p95_latency_ms": 403.6679,
+    "throughput_samples_per_sec": 60.11,
+    "peak_memory_mb": null,
+    "num_warmup": 20,
+    "num_iters": 100,
+    "tag": "fp32_cpu_final"
+  },
+  {
+    "batch_size": 32,
+    "median_latency_ms": 544.2553,
+    "p95_latency_ms": 688.5168,
+    "throughput_samples_per_sec": 58.8,
+    "peak_memory_mb": null,
+    "num_warmup": 20,
+    "num_iters": 100,
+    "tag": "fp32_cpu_final"
+  },
+  {
+    "batch_size": 64,
+    "median_latency_ms": 1010.797,
+    "p95_latency_ms": 1279.2822,
+    "throughput_samples_per_sec": 63.32,
+    "peak_memory_mb": null,
+    "num_warmup": 20,
+    "num_iters": 100,
+    "tag": "fp32_cpu_final"
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "batch_size": 1,
+    "median_latency_ms": 167.0001,
+    "p95_latency_ms": 234.9471,
+    "throughput_samples_per_sec": 5.99,
+    "peak_memory_mb": null,
+    "num_warmup": 2,
+    "num_iters": 5,
+    "tag": "test_int8_cpu"
+  },
+  {
+    "batch_size": 2,
+    "median_latency_ms": 357.5554,
+    "p95_latency_ms": 445.1942,
+    "throughput_samples_per_sec": 5.59,
+    "peak_memory_mb": null,
+    "num_warmup": 2,
+    "num_iters": 5,
+    "tag": "test_int8_cpu"
+  }
+]
