@@ -5,7 +5,8 @@ Measures, for each batch size in a sweep:
   - median latency (ms)
   - p95 latency (ms)
   - throughput (samples/sec)
-  - peak GPU memory (MB)
+  - peak memory (MB) -- GPU peak via torch.cuda, or None on CPU (not
+    meaningfully comparable across processes/OS the way GPU peak alloc is)
 
 Methodology (per course rubric §1 / Phase 4 requirements):
   - model.eval() + torch.inference_mode()
@@ -18,8 +19,22 @@ Methodology (per course rubric §1 / Phase 4 requirements):
   - peak memory reset per batch size via
     torch.cuda.reset_peak_memory_stats()
 
-Usage:
-    python -m benchmark.benchmark --batch-sizes 1 2 4 8 16 32 64 \
+NEW: --device and --quantized let you run the SAME script to produce the
+controlled FP32-CPU vs INT8-CPU comparison (precision is the only variable
+that changes between the two runs, same device, same machine):
+
+    # FP32 on CPU (forces CPU even if a GPU is present)
+    python -m src.benchmark.benchmark --device cpu \
+        --checkpoint models/distilbert_imdb_baseline.pt \
+        --tag fp32_cpu --output results/benchmark_fp32_cpu.csv
+
+    # INT8 (dynamic quantization is CPU-only regardless of --device)
+    python -m src.benchmark.benchmark --quantized \
+        --checkpoint models/distilbert_imdb_baseline.pt \
+        --tag int8_cpu --output results/benchmark_int8_cpu.csv
+
+Usage (original FP32-GPU sweep, unchanged):
+    python -m src.benchmark.benchmark --batch-sizes 1 2 4 8 16 32 64 \
         --checkpoint models/distilbert_imdb_baseline.pt \
         --output results/benchmark_fp32.csv
 
@@ -38,6 +53,7 @@ import time
 import torch
 
 from src.model.model import build_model
+from src.quantize_utils import build_quantized_model
 from src.utils.reproducibility import set_seed
 
 SEQ_LEN = 128
@@ -48,7 +64,10 @@ def build_synthetic_batch(batch_size: int, seq_len: int, vocab_size: int, device
     real IMDb text) keeps the input distribution IDENTICAL across every
     batch size and every precision/quantization variant, so batch size
     (or precision) is the only thing that changes between runs -- exactly
-    what Phase 5/6 require ('do not change multiple variables at once')."""
+    what Phase 5/6 require ('do not change multiple variables at once').
+    This also means no HF dataset download is needed to run this script,
+    which matters specifically on HPC where the IMDb dataset is not
+    reliably reachable."""
     input_ids = torch.randint(
         low=0, high=vocab_size, size=(batch_size, seq_len), device=device
     )
@@ -134,37 +153,72 @@ def main():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--output", type=str, default="results/benchmark_fp32.csv")
     parser.add_argument("--tag", type=str, default="fp32",
-                         help="Label for this run, e.g. fp32 / fp16 / int8. "
+                         help="Label for this run, e.g. fp32 / fp32_cpu / int8_cpu. "
                               "Stored in the output so runs can be concatenated later.")
+    parser.add_argument("--device", type=str, default=None, choices=["cpu", "cuda"],
+                         help="Force a specific device. If omitted, auto-selects "
+                              "cuda if available, else cpu. Use --device cpu to "
+                              "force a CPU run on a machine that also has a GPU, "
+                              "so you get a controlled FP32-CPU baseline to compare "
+                              "against --quantized (which is CPU-only anyway).")
+    parser.add_argument("--quantized", action="store_true",
+                         help="Build a dynamically INT8-quantized model instead of "
+                              "the plain FP32 model. Requires --checkpoint (quantization "
+                              "is applied to a fine-tuned checkpoint, not a random head). "
+                              "Always runs on CPU regardless of --device, since PyTorch "
+                              "dynamic quantization has no CUDA kernels.")
     args = parser.parse_args()
 
     set_seed(args.seed)
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Device: {device}")
-    if device.type != "cuda":
-        print("WARNING: no CUDA device found. Latency/throughput numbers from a "
-              "CPU run are NOT comparable to your GPU numbers -- keep them in a "
-              "separate results file and label it clearly.")
-
-    model = build_model()
-    if args.checkpoint is not None:
-        if not os.path.exists(args.checkpoint):
-            raise FileNotFoundError(
-                f"Checkpoint not found at {args.checkpoint}. "
-                f"Train first (python -m train) or pass --checkpoint correctly."
-            )
-        state_dict = torch.load(args.checkpoint, map_location=device)
-        model.load_state_dict(state_dict)
-        print(f"Loaded fine-tuned checkpoint: {args.checkpoint}")
+    # --- resolve device ---
+    if args.quantized:
+        if args.device == "cuda":
+            print("WARNING: --quantized forces CPU (dynamic quantization has no "
+                  "CUDA kernels). Ignoring --device cuda.")
+        device = torch.device("cpu")
+    elif args.device is not None:
+        device = torch.device(args.device)
+        if device.type == "cuda" and not torch.cuda.is_available():
+            raise RuntimeError("--device cuda requested but CUDA is not available here.")
     else:
-        print("WARNING: no --checkpoint given. Running with an UNTRAINED "
-              "classification head. Latency/throughput/memory numbers are "
-              "still valid (they don't depend on trained weights), but do "
-              "NOT report accuracy from this run.")
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    model.to(device)
-    model.eval()  # required before inference_mode timing
+    print(f"Device: {device}" + (" (quantized: CPU forced)" if args.quantized else ""))
+    if device.type != "cuda" and not args.quantized:
+        print("WARNING: running on CPU. Latency/throughput/memory numbers from a "
+              "CPU run are NOT comparable to GPU numbers -- keep them in a "
+              "separate results file and label it clearly (this is exactly what "
+              "--tag is for).")
+
+    # --- build model ---
+    if args.quantized:
+        if args.checkpoint is None or not os.path.exists(args.checkpoint):
+            raise FileNotFoundError(
+                "--quantized requires a valid --checkpoint (quantizing an "
+                "untrained head is not a meaningful measurement)."
+            )
+        print(f"Building dynamically-quantized INT8 model from: {args.checkpoint}")
+        model = build_quantized_model(args.checkpoint)
+        # build_quantized_model already puts the model on CPU and calls .eval()
+    else:
+        model = build_model()
+        if args.checkpoint is not None:
+            if not os.path.exists(args.checkpoint):
+                raise FileNotFoundError(
+                    f"Checkpoint not found at {args.checkpoint}. "
+                    f"Train first (python -m src.train) or pass --checkpoint correctly."
+                )
+            state_dict = torch.load(args.checkpoint, map_location=device)
+            model.load_state_dict(state_dict)
+            print(f"Loaded fine-tuned checkpoint: {args.checkpoint}")
+        else:
+            print("WARNING: no --checkpoint given. Running with an UNTRAINED "
+                  "classification head. Latency/throughput/memory numbers are "
+                  "still valid (they don't depend on trained weights), but do "
+                  "NOT report accuracy from this run.")
+        model.to(device)
+        model.eval()  # required before inference_mode timing
 
     vocab_size = model.config.vocab_size
 

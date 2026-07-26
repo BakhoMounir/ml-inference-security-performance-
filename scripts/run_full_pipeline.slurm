@@ -1,10 +1,17 @@
 #!/bin/bash
 #SBATCH --job-name=distilbert_full_pipeline
-#SBATCH --gres=gpu:1
-#SBATCH --partition=gpu
+#SBATCH --partition=debug
+#SBATCH --gres=gpu:a40:1   # confirmed via `sinfo`: --gres=gpu:1 alone is not
+                            # sufficient on this cluster, must name the GPU type
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
-#SBATCH --time=01:00:00
+#SBATCH --time=00:30:00   # capped: debug partition's hard limit is 30 min
+                           # (confirmed via sinfo). Fine here since your
+                           # checkpoint already exists and training will
+                           # be skipped -- if it didn't exist, this job
+                           # would need to run on a non-debug GPU partition
+                           # instead, since training + benchmarking won't
+                           # fit in 30 min.
 #SBATCH --output=logs/pipeline_%j.out
 #SBATCH --error=logs/pipeline_%j.err
 
@@ -20,9 +27,11 @@ mkdir -p logs results models
 source ~/.bashrc
 conda activate your_env_name   # <-- EDIT: replace with your actual env name
 
-cd "$SLURM_SUBMIT_DIR/src"
+cd "$SLURM_SUBMIT_DIR"          # project ROOT -- NOT src/, see note in
+                                 # run_benchmark.slurm for why this matters
+export HF_HUB_OFFLINE=1
 
-CHECKPOINT=../models/distilbert_imdb_baseline.pt
+CHECKPOINT=models/distilbert_imdb_baseline.pt
 
 echo "=== $(date) : job started on $(hostname) ==="
 python -c "import torch; print('CUDA available:', torch.cuda.is_available()); print('Device:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU only')"
@@ -31,24 +40,24 @@ if [ -f "$CHECKPOINT" ]; then
     echo "=== Checkpoint already exists at $CHECKPOINT -- skipping training ==="
 else
     echo "=== No checkpoint found -- training baseline (1 epoch, ~10 min on A40) ==="
-    python -m train
+    python -m src.train
 fi
 
 echo "=== Step 1: benchmark harness validation (small, fast) ==="
-python -m benchmark.benchmark \
+python -m src.benchmark.benchmark \
     --batch-sizes 1 2 \
     --num-warmup 3 \
     --num-iters 5 \
     --tag fp32_validation \
-    --output ../results/benchmark_validation.csv
+    --output results/benchmark_validation.csv
 
 echo "=== Step 2: full FP32 batch-size sweep ==="
-python -m benchmark.benchmark \
+python -m src.benchmark.benchmark \
     --batch-sizes 1 2 4 8 16 32 64 \
     --checkpoint "$CHECKPOINT" \
     --num-warmup 10 \
     --num-iters 50 \
     --tag fp32 \
-    --output ../results/benchmark_fp32.csv
+    --output results/benchmark_fp32.csv
 
 echo "=== $(date) : job finished ==="
