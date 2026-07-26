@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.env
+*.env
+.cache/
+data/raw/
+data/processed/
+checkpoints/
+models/
+outputs/
+logs/
+*.pt
+*.pth
+*.bin
+*.safetensors

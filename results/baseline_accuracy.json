@@ -1,0 +1,10 @@
+{
+  "model": "distilbert-base-uncased",
+  "checkpoint": "models/distilbert_imdb_baseline.pt",
+  "dataset": "stanfordnlp/imdb",
+  "split": "test",
+  "device": "cuda",
+  "test_loss": 0.29927395142793656,
+  "test_accuracy": 0.8702,
+  "test_accuracy_percent": 87.02
+}
