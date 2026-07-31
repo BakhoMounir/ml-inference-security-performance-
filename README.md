@@ -108,10 +108,7 @@ run — useful on an HPC node where outbound access to huggingface.co
 is often unreliable. Fetch and cache it once:
 
 ```bash
-python -c "
-from datasets import load_dataset
-ds = load_dataset('stanfordnlp/imdb')
-ds.save_to_disk('imdb_dataset')
+python -c "from datasets import load_dataset; ds = load_dataset('stanfordnlp/imdb'); ds.save_to_disk('imdb_dataset')"
 "
 ```
 
