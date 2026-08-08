@@ -1,3 +1,0 @@
-tag,batch_size,median_latency_ms,p95_latency_ms,throughput_samples_per_sec,peak_memory_mb,num_warmup,num_iters
-test_int8_cpu,1,167.0001,234.9471,5.99,,2,5
-test_int8_cpu,2,357.5554,445.1942,5.59,,2,5
